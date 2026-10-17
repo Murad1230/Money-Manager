@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hishab – Money Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF2EF;--ink:#13282B;--mute:#66807E;--card:#fff;--line:#DAE4E0;--jade:#0E7C66;--coral:#D4442F}
+@media(prefers-color-scheme:dark){:root{--bg:#0E191A;--ink:#E4EFEC;--mute:#8CA4A1;--card:#172829;--line:#253A3B;--jade:#2FB598;--coral:#F0735F}}
+*{box-sizing:border-box;margin:0}
+body{font:15px/1.4 'Hind Siliguri',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:84px}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--jade);outline-offset:2px}
+#app{max-width:480px;margin:auto}
+.top{background:#13282B;color:#E8F3EF;padding:max(16px,env(safe-area-inset-top)) 18px 20px;border-radius:0 0 22px 22px}
+.top button{color:#E8F3EF}
+.mn{display:flex;justify-content:space-between;align-items:center;font-weight:600}
+.mn button{font-size:26px;padding:0 12px;line-height:1}
+.net{margin:14px 0 4px;text-align:center}.net small{opacity:.7;display:block}
+.net b{font-size:38px;letter-spacing:-.5px}
+.trio{display:flex;justify-content:space-around;margin-top:10px;font-size:13px;opacity:.9}
+.trio span{text-align:center}.trio b{display:block;font-size:16px}
+.in{color:#5FE0BE}.out{color:#FF8C79}
+.income{color:var(--jade)}.expense{color:var(--coral)}.transfer{color:var(--mute)}
+.body{padding:14px 14px 0}
+.day{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);margin:14px 4px 6px;font-weight:600}
+.row{display:flex;gap:12px;align-items:center;background:var(--card);padding:10px 12px;border-radius:12px;margin-bottom:6px;width:100%;text-align:left}
+.ic{width:36px;height:36px;border-radius:10px;color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.mid{flex:1;min-width:0}.mid b{display:block}.mid small,small{color:var(--mute);font-size:12.5px}
+.mid small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini{background:var(--jade);color:#fff;padding:8px 12px;border-radius:10px;font-weight:600;white-space:nowrap}.carry{color:var(--jade)}
+.empty{text-align:center;color:var(--mute);padding:46px 24px}
+.card{background:var(--card);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.between{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bar{height:8px;background:var(--line);border-radius:8px;margin:9px 0 6px;overflow:hidden}.bar i{display:block;height:100%;border-radius:8px}
+.card input[type=number]{width:118px;text-align:right;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:5px 8px}
+.seg{display:flex;background:var(--line);border-radius:10px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;padding:7px;border-radius:8px;font-weight:600;color:var(--mute)}
+.seg .on{background:var(--card);color:var(--ink)}
+.donut{display:block;margin:6px auto 12px;width:210px;height:210px}
+.legend{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid var(--line)}
+.legend i{width:12px;height:12px;border-radius:4px;flex:none}.legend span{flex:1}
+.group{font-weight:700;margin:16px 4px 6px;display:flex;justify-content:space-between}
+.act{display:block;width:100%;text-align:left;background:var(--card);border-radius:12px;padding:14px;margin-bottom:8px;font-weight:600}
+.act small{display:block;font-weight:400}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav div{display:flex;width:100%;max-width:480px}
+nav button{flex:1;padding:14px 0;color:var(--mute);font-weight:600;font-size:13.5px}
+nav .on{color:var(--jade);box-shadow:inset 0 3px 0 var(--jade)}
+#fab{position:fixed;right:max(18px,calc(50% - 222px));bottom:calc(76px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:18px;background:var(--jade);color:#fff;font-size:32px;box-shadow:0 6px 18px rgba(14,124,102,.45)}
+#sheet{position:fixed;inset:0;background:rgba(5,15,15,.55);display:none;align-items:flex-end;justify-content:center;z-index:5}
+#sheet.on{display:flex}
+.pane{background:var(--bg);width:100%;max-width:480px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.pane{animation:none}}
+.pane label{display:block;font-size:13px;color:var(--mute);margin-bottom:10px}
+.pane input,.pane select{display:block;width:100%;margin-top:4px;padding:10px 12px;border:1px solid var(--line);background:var(--card);border-radius:10px;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 14px}
+.chips button{padding:6px 12px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.chips .on{background:var(--jade);border-color:var(--jade);color:#fff}
+.btns{display:flex;gap:8px;margin-top:6px}.btns button{flex:1;padding:12px;border-radius:12px;background:var(--line);font-weight:600}
+.btns .pri{background:var(--jade);color:#fff;flex:2}.btns .del{color:var(--coral)}
+#toast{position:fixed;left:50%;bottom:150px;transform:translateX(-50%);background:#13282B;color:#fff;padding:10px 16px;border-radius:12px;display:none;z-index:9;max-width:90%}
+
+body{background:radial-gradient(900px 520px at 12% -8%,#CDE8DE,transparent),radial-gradient(700px 480px at 100% 0,#DAE5F1,transparent),var(--bg);padding-bottom:104px}
+@media(prefers-color-scheme:dark){body{background:radial-gradient(800px 500px at 10% -10%,#11423B,transparent),var(--bg)}}
+#app{max-width:440px;min-height:100vh}
+.top{background:linear-gradient(145deg,#0A4A42 0%,#0E7C66 58%,#17A688 100%);position:relative;overflow:hidden;border-radius:0 0 34px 34px;padding-bottom:24px;box-shadow:0 12px 30px rgba(14,124,102,.28)}
+.top:before,.top:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.07)}
+.top:before{width:230px;height:230px;right:-80px;top:-100px}.top:after{width:170px;height:170px;left:-70px;bottom:-90px}
+.top>*{position:relative}.mn span{font-size:16px}
+.net b{font-size:44px;font-weight:700;letter-spacing:-1px}
+.trio{gap:10px;margin-top:16px}
+.trio span{flex:1;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:9px 6px}
+.row{border-radius:16px;padding:11px 12px;box-shadow:0 1px 2px rgba(16,42,43,.06),0 8px 18px rgba(16,42,43,.05)}
+.card{border-radius:18px;box-shadow:0 1px 2px rgba(16,42,43,.06),0 8px 18px rgba(16,42,43,.05)}
+.ic{width:42px;height:42px;border-radius:14px}.ic svg{width:21px;height:21px}
+.cn{display:flex;align-items:center;gap:10px}
+.chips button{display:flex;align-items:center;gap:6px}.chips svg{width:16px;height:16px}
+nav{background:none;border:0;pointer-events:none;padding:0 12px calc(10px + env(safe-area-inset-bottom))}
+nav div{pointer-events:auto;max-width:420px;background:var(--card);border-radius:24px;padding:4px;box-shadow:0 12px 32px rgba(10,40,36,.2),0 0 0 1px var(--line)}
+nav button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 0 8px;font-size:12px;border-radius:18px}
+nav svg{width:22px;height:22px}
+nav .on{box-shadow:none;background:color-mix(in srgb,var(--jade) 13%,transparent)}
+#fab{bottom:calc(94px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:20px;background:linear-gradient(145deg,#17A688,#0A6552);box-shadow:0 10px 22px rgba(14,124,102,.45),0 0 0 4px rgba(255,255,255,.35);right:max(18px,calc(50% - 202px))}
+@media(min-width:600px){#app{margin:20px auto;min-height:calc(100vh - 40px);border-radius:36px;overflow:hidden;box-shadow:0 30px 80px rgba(8,40,36,.28),0 0 0 8px #0C1B1C;background:var(--bg)}nav{padding-bottom:36px}#fab{bottom:118px}}
+</style></head>
+<body>
+<div id="app"></div>
+<button id="fab" aria-label="Add record" onclick="openTx()">+</button>
+<nav><div>
+<button data-t="rec" onclick="go('rec')">Records</button>
+<button data-t="stats" onclick="go('stats')">Stats</button>
+<button data-t="bud" onclick="go('bud')">Budget</button>
+<button data-t="acc" onclick="go('acc')">Accounts</button>
+<button data-t="more" onclick="go('more')">More</button>
+</div></nav>
+<div id="sheet"></div><div id="toast" role="status"></div>
+<input type="file" id="rf" accept=".json" hidden>
+<script>
+const $=s=>document.querySelector(s),K='hishab.v1';
+const CATS={expense:['Food','Transport','Shopping','Bills','Rent','Health','Education','Fun','Other'],income:['Salary','Business','Gift','Bonus','Other']};
+const GROUPS=['Cash','Bank','Mobile wallet','Card','Loan','Other'];
+const P=['#0E7C66','#D4442F','#C98A0B','#3B6FB6','#8A5CC2','#C9507E','#4C9A2A','#D8702A','#5F7A8A'];
+let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
+const fresh=()=>({accounts:[{id:1,name:'Cash',group:'Cash',init:0},{id:2,name:'bKash',group:'Mobile wallet',init:0},{id:3,name:'Bank',group:'Bank',init:0}],txs:[],budgets:{},n:10});
+S=S||fresh();
+let lang=S.lang||'bn';document.documentElement.lang=lang;
+let tab='rec',st='expense',fm=null,kind='tx',month=today().slice(0,7);
+function today(){return new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10)}
+const save=()=>{S.at=Date.now();try{localStorage.setItem(K,JSON.stringify(S))}catch(e){toast('Could not save. Browser storage is blocked.')}window.cloud&&cloud.push()};
+function cloudGet(){return S}
+function applyRemote(j){try{const r=JSON.parse(j);if(!Array.isArray(r.accounts)||!Array.isArray(r.txs))return;S=r;S.budgets=S.budgets||{};S.lang=lang;try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}if(!fm)render()}catch(e){}}
+function refresh(){if(tab=='more'&&!fm)render()}
+function cloudCard(){const c=window.cloud||{};
+ if(!c.ok)return '<div class=card><b>Cloud sync</b><small style="display:block;margin-top:4px">Not set up. Add your Firebase keys in the file to sync across devices.</small></div>';
+ if(!c.user)return '<button class=act onclick="cloud.login()">Sign in with Google<small>Sync your records across all your devices</small></button>';
+ return `<div class=card><div class=between><div><b>${esc(c.user.email||c.user.displayName||'')}</b><small style="display:block">${c.status=='error'?'Sync failed. Will retry on next change.':c.status=='syncing'?'Syncing…':'Synced to cloud'}</small></div><button class=mini onclick="cloud.logout()">Sign out</button></div></div>`}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>(n<0?'-':'')+'৳'+Math.round(Math.abs(n)).toLocaleString(lang=='bn'?'bn-BD':'en-IN');
+const col=c=>P[[...c].reduce((s,ch)=>s+ch.charCodeAt(0),0)%P.length];
+const raw=id=>(S.accounts.find(x=>x.id==id)||{}).name||'';
+const nm=id=>'<span>'+esc(raw(id)||'—')+'</span>';
+const sum=(ts,ty)=>ts.filter(t=>t.type==ty).reduce((s,t)=>s+t.amt,0);
+const inMonth=ty=>S.txs.filter(t=>t.date.startsWith(month)&&(!ty||t.type==ty));
+const cap=s=>s[0].toUpperCase()+s.slice(1);
+const dl=d=>new Date(d+'T00:00').toLocaleDateString(LC(),{weekday:'short',day:'numeric',month:'short'});
+
+const svg=d=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+const IC={food:'M7 3v7a2 2 0 002 2v9M5 3v6M9 3v6M17 3c-2.5 1.5-3 4.5-3 8h3v10',bus:'M5 16V6a2 2 0 012-2h10a2 2 0 012 2v10M5 16h14M5 16v2h2v-2M17 16v2h2v-2M5 11h14M8.5 13.5h.01M15.5 13.5h.01',bag:'M6 8h12l1 12H5L6 8zM9 8a3 3 0 016 0',bill:'M6 3h12v18l-3-2-3 2-3-2-3 2V3zM9 8h6M9 12h6',home:'M4 11l8-7 8 7M6 10v10h12V10M10 20v-5h4v5',heart:'M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z',book:'M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2V5zM4 19a2 2 0 012-2h13',star:'M12 3l2.6 5.6 6 .8-4.4 4.2 1.1 6L12 16.8l-5.3 2.8 1.1-6L3.4 9.4l6-.8L12 3z',dots:'M6 12h.01M12 12h.01M18 12h.01',wallet:'M4 7h15a1 1 0 011 1v11a1 1 0 01-1 1H5a2 2 0 01-2-2V6a2 2 0 012-2h11M16 14h.01',case:'M4 8h16v11H4zM9 8V5h6v3M4 13h16',gift:'M4 11h16v9H4zM3 8h18v3H3zM12 8v12M12 8S9 8 9 6a1.8 1.8 0 013-1M12 8s3 0 3-2a1.8 1.8 0 00-3-1',spark:'M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18',swap:'M4 8h14l-3-3M20 16H6l3 3',carry:'M5 5v8a3 3 0 003 3h11M15 12l4 4-4 4',bank:'M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18',phone:'M8 3h8a1 1 0 011 1v16a1 1 0 01-1 1H8a1 1 0 01-1-1V4a1 1 0 011-1zM11 18h2',card:'M3 6h18v12H3zM3 10h18M7 15h3'};
+const CI={Food:'food',Transport:'bus',Shopping:'bag',Bills:'bill',Rent:'home',Health:'heart',Education:'book',Fun:'star',Other:'dots',Salary:'wallet',Business:'case',Gift:'gift',Bonus:'spark',Transfer:'swap','Carry over':'carry'};
+const GI={Cash:'wallet',Bank:'bank','Mobile wallet':'phone',Card:'card',Loan:'swap',Other:'dots'};
+const NI={rec:'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01',stats:'M12 3a9 9 0 109 9h-9V3zM15 3.5A9 9 0 0120.5 9H15V3.5z',bud:'M12 21a9 9 0 100-18 9 9 0 000 18zM12 16a4 4 0 100-8 4 4 0 000 8zM12 12h.01',acc:IC.wallet,more:'M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z'};
+const D={'Records':'রেকর্ড','Stats':'পরিসংখ্যান','Budget':'বাজেট','Accounts':'অ্যাকাউন্ট','More':'আরও','Left this month':'এই মাসে বাকি','Income':'আয়','Expense':'খরচ','Carried over':'আগের মাস থেকে','Carry over':'আগের মাসের বাকি','Add to this month':'এই মাসে যোগ করুন','From previous month':'আগের মাস থেকে','No records this month.':'এই মাসে কোনো রেকর্ড নেই।','Tap + to add your first expense or income.':'প্রথম আয় বা খরচ যোগ করতে + চাপুন।','Transfer':'ট্রান্সফার','Total':'মোট','Nothing to show yet.':'এখনো দেখানোর মতো কিছু নেই।','Budget left':'বাজেটের বাকি','Spent':'খরচ হয়েছে','Total assets':'মোট সম্পদ','+ Add account':'+ অ্যাকাউন্ট যোগ করুন','Cash':'নগদ টাকা','Bank':'ব্যাংক','Mobile wallet':'মোবাইল ওয়ালেট','Card':'কার্ড','Loan':'ঋণ','Other':'অন্যান্য','Food':'খাবার','Transport':'যাতায়াত','Shopping':'কেনাকাটা','Bills':'বিল','Rent':'ভাড়া','Health':'চিকিৎসা','Education':'শিক্ষা','Fun':'বিনোদন','Salary':'বেতন','Business':'ব্যবসা','Gift':'উপহার','Bonus':'বোনাস','Export records (CSV)':'রেকর্ড এক্সপোর্ট (CSV)','Open in Excel or Google Sheets':'Excel বা Google Sheets এ খুলুন','Back up data (JSON)':'ডেটা ব্যাকআপ (JSON)','Save a full copy of everything':'সবকিছুর পূর্ণ কপি সেভ করুন','Restore from backup':'ব্যাকআপ থেকে ফেরত আনুন','Replaces all current data':'বর্তমান সব ডেটা বদলে যাবে','Erase all data':'সব ডেটা মুছে ফেলুন','Cannot be undone':'এটি ফেরানো যাবে না','Hishab keeps your data on this device only.':'হিসাব আপনার ডেটা শুধু এই ডিভাইসে রাখে।','Back up regularly.':'নিয়মিত ব্যাকআপ নিন।','Amount (৳)':'পরিমাণ (৳)','Date':'তারিখ','Account':'অ্যাকাউন্ট','From':'কোথা থেকে','To':'কোথায়','Note':'নোট','Delete':'মুছুন','Cancel':'বাতিল','Save':'সংরক্ষণ','Name':'নাম','Type':'ধরন','Opening balance':'শুরুর ব্যালেন্স','Add record':'রেকর্ড যোগ করুন','Set budget':'বাজেট দিন','Previous month':'আগের মাস','Next month':'পরের মাস','Saved':'সংরক্ষিত হয়েছে','Deleted':'মুছে ফেলা হয়েছে','Removed':'সরানো হয়েছে','Updated':'আপডেট হয়েছে','Carry over added':'আগের মাসের বাকি যোগ হয়েছে','Enter an amount greater than 0.':'০ এর বেশি পরিমাণ দিন।','Pick a date.':'তারিখ বাছুন।','Choose two different accounts.':'দুটি আলাদা অ্যাকাউন্ট বাছুন।','Give the account a name.':'অ্যাকাউন্টের একটি নাম দিন।','This account has records. Delete or edit them first.':'এই অ্যাকাউন্টে রেকর্ড আছে। আগে সেগুলো মুছুন বা বদলান।','Keep at least one account.':'অন্তত একটি অ্যাকাউন্ট রাখুন।','That file is not a Hishab backup.':'এটি হিসাবের ব্যাকআপ ফাইল নয়।','Backup restored':'ব্যাকআপ ফেরত আনা হয়েছে','Could not save. Browser storage is blocked.':'সেভ করা যায়নি। ব্রাউজার স্টোরেজ বন্ধ আছে।','Delete this record?':'এই রেকর্ডটি মুছবেন?','Delete this account?':'এই অ্যাকাউন্টটি মুছবেন?','Replace all current data with this backup?':'বর্তমান সব ডেটা এই ব্যাকআপ দিয়ে বদলাবেন?','Erase every record, account and budget?':'সব রেকর্ড, অ্যাকাউন্ট ও বাজেট মুছবেন?','Really erase everything? This cannot be undone.':'সত্যিই সব মুছবেন? এটি ফেরানো যাবে না।','Carry over amount (৳). Clear the box to remove it.':'আগের মাসের বাকির পরিমাণ (৳)। সরাতে ঘরটি ফাঁকা করুন।','Cloud sync':'ক্লাউড সিংক','Not set up. Add your Firebase keys in the file to sync across devices.':'এখনো চালু হয়নি। সব ডিভাইসে সিংক করতে ফাইলে Firebase কী যোগ করুন।','Sign in with Google':'Google দিয়ে সাইন ইন','Sync your records across all your devices':'সব ডিভাইসে আপনার হিসাব সিংক করুন','Sign out':'সাইন আউট','Sync failed. Will retry on next change.':'সিংক হয়নি। পরের পরিবর্তনে আবার চেষ্টা হবে।','Syncing…':'সিংক হচ্ছে…','Synced to cloud':'ক্লাউডে সিংক হয়েছে','This device already has records, and the cloud has data too. OK uses the cloud data. Cancel keeps this device data and uploads it.':'এই ডিভাইসে রেকর্ড আছে, ক্লাউডেও ডেটা আছে। OK দিলে ক্লাউডের ডেটা ব্যবহার হবে। Cancel দিলে এই ডিভাইসের ডেটা ক্লাউডে যাবে।'};
+const rx=s=>{let m=s.match(/^(.+) ended with (.+) left$/);if(m)return m[1]+' শেষে '+m[2]+' বাকি ছিল';
+ if(m=s.match(/^Add some (\w+) records/))return 'চার্ট দেখতে কয়েকটি '+(m[1]=='income'?'আয়':'খরচ')+'-এর রেকর্ড যোগ করুন।';
+ return s.replace(/\bspent\b/g,'খরচ').replace(/\bleft\b/g,'বাকি').replace(/\bover\b/g,'বেশি')};
+const T=s=>lang=='bn'?(D[s]||rx(s)):s;
+const bn=s=>lang=='bn'?s.replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]):s;
+const LC=()=>lang=='bn'?'bn-BD':'en-GB';
+function tl(r){if(lang!='bn'||!r)return;const w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT),L=[];let n;while(n=w.nextNode())L.push(n);
+ L.forEach(n=>{const k=n.nodeValue.trim();if(k)n.nodeValue=bn(n.nodeValue.replace(k,T(k)))});
+ r.querySelectorAll('[placeholder],[aria-label]').forEach(e=>['placeholder','aria-label'].forEach(a=>e.hasAttribute(a)&&e.setAttribute(a,T(e.getAttribute(a)))))}
+const _c=window.confirm.bind(window),_p=window.prompt.bind(window);window.confirm=m=>_c(T(m));window.prompt=(m,d)=>_p(T(m),d);
+function setLang(){S.lang=lang=='bn'?'en':'bn';save();location.reload()}
+function bal(id){const a=S.accounts.find(x=>x.id==id);let b=a?a.init:0;
+ S.txs.forEach(t=>{if(t.a==id)b+=t.type=='income'?t.amt:-t.amt;if(t.type=='transfer'&&t.b==id)b+=t.amt});return b}
+function toast(m){const t=$('#toast');t.textContent=bn(T(m));t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',2600)}
+function go(t){tab=t;render();scrollTo(0,0)}
+function sh(d){const[y,m]=month.split('-').map(Number),dt=new Date(y,m-1+d,1);month=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');render()}
+function hdr(extra){const l=new Date(month+'-01').toLocaleDateString(LC(),{month:'long',year:'numeric'});
+ return `<div class=top><div class=mn><button onclick="sh(-1)" aria-label="Previous month">‹</button><span>${l}</span><button onclick="sh(1)" aria-label="Next month">›</button></div>${extra}</div>`}
+
+const left=m=>{const l=S.txs.filter(t=>t.date.startsWith(m));return sum(l,'income')+sum(l,'carry')-sum(l,'expense')};
+function pm(){const[y,m]=month.split('-').map(Number),d=new Date(y,m-2,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function addCarry(p){S.txs.push({id:S.n++,type:'carry',date:month+'-01',amt:p,cat:'Carry over',a:null,b:null,note:''});save();render();toast('Carry over added')}
+function editCarry(id){const t=S.txs.find(x=>x.id==id),v=prompt('Carry over amount (৳). Clear the box to remove it.',t.amt);if(v===null)return;
+ const n=parseFloat(v);if(v.trim()===''){S.txs=S.txs.filter(x=>x.id!=id);toast('Removed')}else if(n>0){t.amt=n;toast('Updated')}else return toast('Enter an amount greater than 0.');save();render()}
+function rec(){
+ const ts=inMonth().sort((x,y)=>y.date.localeCompare(x.date)||y.id-x.id),i=sum(ts,'income'),c=sum(ts,'carry'),e=sum(ts,'expense'),p=left(pm()),pl=new Date(pm()+'-01').toLocaleDateString(LC(),{month:'long'});
+ let h='',last='';
+ ts.forEach(t=>{
+  if(t.date!=last){last=t.date;h+=`<div class=day><span>${dl(last)}</span><span>${fmt(sum(ts.filter(x=>x.date==last),'expense'))} spent</span></div>`}
+  const tr=t.type=='transfer';
+  h+=`<button class=row onclick="${t.type=='carry'?'editCarry':'openTx'}(${t.id})"><div class=ic style="background:color-mix(in srgb,${tr?'#5F7A8A':col(t.cat)} 16%,transparent);color:${tr?'#5F7A8A':col(t.cat)}">${svg(IC[CI[t.cat]||'dots'])}</div><div class=mid><b>${esc(t.cat)}</b><small>${t.type=='carry'?'From previous month':esc(t.note)+' '+(tr?nm(t.a)+' → '+nm(t.b):nm(t.a))}</small></div><b class=${t.type}>${t.type=='expense'?'-':t.type=='transfer'?'':'+'}${fmt(t.amt)}</b></button>`});
+ if(!h)h='<div class=empty>No records this month.<br>Tap + to add your first expense or income.</div>';
+ return hdr(`<div class=net><small>Left this month</small><b>${fmt(i+c-e)}</b></div><div class=trio><span>Income<b class=in>${fmt(i)}</b></span>${c?`<span>Carried over<b class=in>${fmt(c)}</b></span>`:''}<span>Expense<b class=out>${fmt(e)}</b></span></div>`)+`<div class=body>${p>0&&!c?`<div class=card><div class=between><div><b>Carry over</b><small style="display:block">${pl} ended with ${fmt(p)} left</small></div><button class=mini onclick="addCarry(${p})">Add to this month</button></div></div>`:''}${h}</div>`}
+
+function stats(){
+ const ts=inMonth(st),m={};ts.forEach(t=>m[t.cat]=(m[t.cat]||0)+t.amt);
+ const e=Object.entries(m).sort((a,b)=>b[1]-a[1]),tot=e.reduce((s,x)=>s+x[1],0);let off=0,arcs='',leg='';
+ e.forEach(([c,v])=>{const p=v/tot*100;
+  arcs+=`<circle r="15.9155" cx="21" cy="21" fill="none" stroke="${col(c)}" stroke-width="6" stroke-dasharray="${p} ${100-p}" stroke-dashoffset="${-off}"/>`;off+=p;
+  leg+=`<div class=legend><i style="background:${col(c)}"></i><span>${esc(c)}</span><small>${p.toFixed(0)}%</small><b>${fmt(v)}</b></div>`});
+ const seg=`<div class=seg>${['expense','income'].map(t=>`<button class="${st==t?'on':''}" onclick="st='${t}';render()">${cap(t)}</button>`).join('')}</div>`;
+ const body=tot?`<svg class=donut viewBox="0 0 42 42" role="img" aria-label="${st} by category"><g transform="rotate(-90 21 21)">${arcs}</g><text x="21" y="20.5" text-anchor="middle" font-size="2.9" fill="var(--mute)">Total</text><text x="21" y="25" text-anchor="middle" font-size="3.6" font-weight="700" fill="var(--ink)">${fmt(tot)}</text></svg>${leg}`:`<div class=empty>Nothing to show yet.<br>Add some ${st} records and the chart appears here.</div>`;
+ return hdr('')+`<div class=body>${seg}${body}</div>`}
+
+function bud(){
+ const ex=inMonth('expense'),tb=Object.values(S.budgets).reduce((s,v)=>s+v,0),ts=ex.reduce((s,t)=>s+t.amt,0);
+ const rows=CATS.expense.map(c=>{const sp=ex.filter(t=>t.cat==c).reduce((s,t)=>s+t.amt,0),b=S.budgets[c]||0,o=b&&sp>b;
+  return `<div class=card><div class=between><div class=cn><div class=ic style="background:color-mix(in srgb,${col(c)} 16%,transparent);color:${col(c)}">${svg(IC[CI[c]||'dots'])}</div><b>${c}</b></div><input type=number inputmode=numeric min=0 placeholder="Set budget" aria-label="${c} budget" value="${b||''}" onchange="setB('${c}',this.value)"></div><div class=bar><i style="width:${b?Math.min(sp/b*100,100):0}%;background:${o?'var(--coral)':'var(--jade)'}"></i></div><small>${fmt(sp)} spent${b?' · '+(o?fmt(sp-b)+' over':fmt(b-sp)+' left'):''}</small></div>`}).join('');
+ return hdr(`<div class=net><small>Budget left</small><b>${tb?fmt(tb-ts):'—'}</b></div><div class=trio><span>Budget<b>${fmt(tb)}</b></span><span>Spent<b class=out>${fmt(ts)}</b></span></div>`)+`<div class=body>${rows}</div>`}
+function setB(c,v){const n=parseFloat(v);if(n>0)S.budgets[c]=n;else delete S.budgets[c];save();render()}
+
+function acc(){
+ const tot=S.accounts.reduce((s,a)=>s+bal(a.id),0);let h='';
+ GROUPS.forEach(g=>{const l=S.accounts.filter(a=>a.group==g);if(!l.length)return;
+  h+=`<div class=group><span>${g}</span><span>${fmt(l.reduce((s,a)=>s+bal(a.id),0))}</span></div>`;
+  l.forEach(a=>h+=`<button class=row onclick="openAcc(${a.id})"><div class=ic style="background:color-mix(in srgb,var(--jade) 16%,transparent);color:var(--jade)">${svg(IC[GI[a.group]||'dots'])}</div><div class=mid><b>${esc(a.name)}</b></div><b class="${bal(a.id)<0?'expense':''}">${fmt(bal(a.id))}</b></button>`)});
+ return `<div class=top><div class=net><small>Total assets</small><b>${fmt(tot)}</b></div></div><div class=body>${h}<button class=act onclick="openAcc()">+ Add account</button></div>`}
+
+function more(){return `<div class=top><div class=mn><span>More</span></div></div><div class=body>${cloudCard()}
+<button class=act onclick="setLang()">ভাষা: বাংলা / Language: English<small>Tap to switch · বদলাতে চাপুন</small></button>
+<button class=act onclick="csv()">Export records (CSV)<small>Open in Excel or Google Sheets</small></button>
+<button class=act onclick="backup()">Back up data (JSON)<small>Save a full copy of everything</small></button>
+<button class=act onclick="$('#rf').click()">Restore from backup<small>Replaces all current data</small></button>
+<button class=act style="color:var(--coral)" onclick="wipe()">Erase all data<small>Cannot be undone</small></button>
+<p class=empty>Hishab keeps your data on this device only.<br>Back up regularly.</p></div>`}
+
+function sheet(){sheet0();tl($('#sheet'))}
+function sheet0(){
+ const el=$('#sheet'),f=fm;if(!f){el.className='';el.innerHTML='';return}
+ el.className='on';
+ const opts=sel=>S.accounts.map(a=>`<option value="${a.id}" ${a.id==sel?'selected':''}>${esc(a.name)}</option>`).join('');
+ if(kind=='acc'){
+  el.innerHTML=`<div class=pane><label>Name<input value="${esc(f.name)}" oninput="fm.name=this.value"></label>
+  <label>Type<select onchange="fm.group=this.value">${GROUPS.map(g=>`<option ${g==f.group?'selected':''}>${g}</option>`).join('')}</select></label>
+  <label>Opening balance<input type=number inputmode=decimal value="${f.init}" oninput="fm.init=this.value"></label>
+  <div class=btns>${f.id?'<button class=del onclick="delAcc()">Delete</button>':''}<button onclick="shut()">Cancel</button><button class=pri onclick="saveAcc()">Save</button></div></div>`;return}
+ const tr=f.type=='transfer';
+ el.innerHTML=`<div class=pane><div class=seg>${['expense','income','transfer'].map(t=>`<button class="${f.type==t?'on':''}" onclick="ft('${t}')">${cap(t)}</button>`).join('')}</div>
+ <label>Amount (৳)<input id=fa type=number inputmode=decimal min=0 value="${f.amt}" oninput="fm.amt=this.value"></label>
+ <label>Date<input type=date value="${f.date}" oninput="fm.date=this.value"></label>
+ ${tr?'':`<div class=chips>${CATS[f.type].map(c=>`<button class="${f.cat==c?'on':''}" onclick="fm.cat='${c}';sheet()">${svg(IC[CI[c]||'dots'])}${c}</button>`).join('')}</div>`}
+ <label>${tr?'From':'Account'}<select onchange="fm.a=+this.value">${opts(f.a)}</select></label>
+ ${tr?`<label>To<select onchange="fm.b=+this.value">${opts(f.b)}</select></label>`:''}
+ <label>Note<input value="${esc(f.note)}" oninput="fm.note=this.value"></label>
+ <div class=btns>${f.edit?'<button class=del onclick="delTx()">Delete</button>':''}<button onclick="shut()">Cancel</button><button class=pri onclick="saveTx()">Save</button></div></div>`;
+ if(!f.edit&&!f.amt)setTimeout(()=>{const a=$('#fa');a&&a.focus()},50)}
+function shut(){fm=null;sheet()}
+function ft(t){fm.type=t;fm.cat=t=='transfer'?'Transfer':(CATS[t].includes(fm.cat)?fm.cat:CATS[t][0]);sheet()}
+function openTx(id){kind='tx';const t=S.txs.find(x=>x.id==id);
+ fm=t?{...t,edit:1,b:t.b||S.accounts[0].id}:{type:'expense',date:today(),amt:'',cat:CATS.expense[0],a:S.accounts[0].id,b:(S.accounts[1]||S.accounts[0]).id,note:''};sheet()}
+function saveTx(){const f=fm,amt=parseFloat(f.amt);
+ if(!(amt>0))return toast('Enter an amount greater than 0.');
+ if(!f.date)return toast('Pick a date.');
+ if(f.type=='transfer'&&f.a==f.b)return toast('Choose two different accounts.');
+ const t={id:f.id||S.n++,type:f.type,date:f.date,amt,cat:f.type=='transfer'?'Transfer':f.cat,a:f.a,b:f.type=='transfer'?f.b:null,note:f.note.trim()};
+ const i=S.txs.findIndex(x=>x.id==t.id);i>=0?S.txs[i]=t:S.txs.push(t);
+ month=t.date.slice(0,7);save();shut();render();toast('Saved')}
+function delTx(){if(!confirm('Delete this record?'))return;S.txs=S.txs.filter(t=>t.id!=fm.id);save();shut();render();toast('Deleted')}
+function openAcc(id){kind='acc';const a=S.accounts.find(x=>x.id==id);fm=a?{...a}:{name:'',group:'Cash',init:0};sheet()}
+function saveAcc(){const f=fm,n=f.name.trim();if(!n)return toast('Give the account a name.');
+ const a={id:f.id||S.n++,name:n,group:f.group,init:parseFloat(f.init)||0},i=S.accounts.findIndex(x=>x.id==a.id);
+ i>=0?S.accounts[i]=a:S.accounts.push(a);save();shut();render();toast('Saved')}
+function delAcc(){if(S.txs.some(t=>t.a==fm.id||t.b==fm.id))return toast('This account has records. Delete or edit them first.');
+ if(S.accounts.length<2)return toast('Keep at least one account.');
+ if(!confirm('Delete this account?'))return;S.accounts=S.accounts.filter(a=>a.id!=fm.id);save();shut();render()}
+
+function file(name,type,data){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1e3)}
+function csv(){const r=[['Date','Type','Category','Account','To','Amount','Note']];
+ S.txs.slice().sort((x,y)=>x.date.localeCompare(y.date)).forEach(t=>r.push([t.date,t.type,t.cat,raw(t.a),t.b?raw(t.b):'',t.amt,t.note]));
+ file('hishab-records.csv','text/csv',r.map(x=>x.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'))}
+function backup(){file('hishab-backup-'+today()+'.json','application/json',JSON.stringify(S))}
+$('#rf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.accounts)||!Array.isArray(d.txs))throw 0;
+  if(!confirm('Replace all current data with this backup?'))return;S=d;S.budgets=S.budgets||{};S.n=S.n||1e4;save();render();toast('Backup restored')}
+  catch(x){toast('That file is not a Hishab backup.')}};r.readAsText(f);e.target.value=''};
+function wipe(){if(confirm('Erase every record, account and budget?')&&confirm('Really erase everything? This cannot be undone.')){S=fresh();S.lang=lang;save();setTimeout(()=>location.reload(),1200)}}
+
+function render(){
+ $('#app').innerHTML=({rec,stats,bud,acc,more})[tab]();
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab));
+ $('#fab').style.display=tab=='rec'?'':'none';tl($('#app'));tl($('nav'));tl($('#fab'))}
+document.querySelectorAll('nav button').forEach(b=>b.insertAdjacentHTML('afterbegin',svg(NI[b.dataset.t])));
+render();
+</script>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import{getDatabase,ref,set,onValue}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+/* ===== Paste your Firebase web app config here (Project settings > Your apps) ===== */
+const cfg={apiKey:'AIzaSyBWgBX_Tm3JsYPxfJ1pbbDC2Kxfl52ronA',authDomain:'money-manager-54056.firebaseapp.com',databaseURL:'https://money-manager-54056-default-rtdb.asia-southeast1.firebasedatabase.app',projectId:'money-manager-54056',storageBucket:'money-manager-54056.firebasestorage.app',messagingSenderId:'719557234689',appId:'1:719557234689:web:fe9f7b1185ef63fbadb000'};
+/* ================================================================================== */
+const ok=!/PASTE/.test(cfg.apiKey),cloud=window.cloud={ok,user:null,status:'',login(){},logout(){},push(){}},note=()=>window.refresh&&refresh();
+if(ok){
+ const app=initializeApp(cfg),auth=getAuth(app),db=getDatabase(app);let unsub,timer,first;
+ cloud.login=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>toast('Sign-in failed: '+(e.code||e.message)));
+ cloud.logout=()=>signOut(auth);
+ cloud.push=()=>{if(!cloud.user)return;cloud.status='syncing';note();clearTimeout(timer);
+  timer=setTimeout(async()=>{try{const s=cloudGet();s.at=s.at||Date.now();await set(ref(db,'users/'+cloud.user.uid),{data:JSON.stringify(s),at:s.at});cloud.status='ok'}catch(e){cloud.status='error'}note()},800)};
+ onAuthStateChanged(auth,u=>{cloud.user=u;unsub&&unsub();first=true;note();if(!u)return;
+  unsub=onValue(ref(db,'users/'+u.uid),snap=>{
+   const s=cloudGet(),was=first;first=false;
+   if(!snap.exists()){cloud.push();return}
+   const d=snap.val(),ra=d.at||0,la=s.at||0;
+   if(was&&!la&&s.txs.length&&!confirm('This device already has records, and the cloud has data too. OK uses the cloud data. Cancel keeps this device data and uploads it.'))return cloud.push();
+   if(ra>la||(was&&!la&&s.txs.length)){applyRemote(d.data);cloud.status='ok';note()}else if(ra<la)cloud.push();else{cloud.status='ok';note()}
+  },()=>{cloud.status='error';note()})});
+ addEventListener('online',()=>cloud.push());
+}
+</script>
+</body></html>
