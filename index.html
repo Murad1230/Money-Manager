@@ -83,6 +83,44 @@ nav svg{width:22px;height:22px}
 nav .on{box-shadow:none;background:color-mix(in srgb,var(--jade) 13%,transparent)}
 #fab{bottom:calc(94px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:20px;background:linear-gradient(145deg,#17A688,#0A6552);box-shadow:0 10px 22px rgba(14,124,102,.45),0 0 0 4px rgba(255,255,255,.35);right:max(18px,calc(50% - 202px))}
 @media(min-width:600px){#app{margin:20px auto;min-height:calc(100vh - 40px);border-radius:36px;overflow:hidden;box-shadow:0 30px 80px rgba(8,40,36,.28),0 0 0 8px #0C1B1C;background:var(--bg)}nav{padding-bottom:36px}#fab{bottom:118px}}
+@media(min-width:900px){
+body{padding:0 0 48px 232px}
+#app{max-width:820px;margin:0 auto;min-height:100vh;border-radius:0;overflow:visible;box-shadow:none;background:none}
+.top{margin:24px 28px 0;border-radius:30px;padding:22px 28px 28px}
+.net b{font-size:54px}.trio span{padding:12px 8px}.trio b{font-size:19px}
+.body{padding:20px 28px 0}
+.row,.card{border-radius:18px}
+nav{display:block;left:0;right:auto;top:0;bottom:0;width:232px;padding:28px 14px;background:var(--card);border-right:1px solid var(--line);pointer-events:auto}
+nav:before{content:"Hishab · হিসাব";display:block;font-size:22px;font-weight:700;color:var(--jade);padding:0 14px 22px}
+nav div{flex-direction:column;max-width:none;box-shadow:none;background:none;padding:0;gap:4px}
+nav button{flex-direction:row;justify-content:flex-start;gap:12px;padding:12px 14px;font-size:15px}
+#fab{right:48px;bottom:48px}
+#sheet{align-items:center}.pane{border-radius:24px;max-width:520px}
+}
+
+*{-webkit-tap-highlight-color:transparent}button{position:relative;overflow:hidden;touch-action:manipulation;transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+button:active{transform:scale(.95)}#fab:active{transform:scale(.9) rotate(90deg)}
+.rip{position:absolute;border-radius:50%;background:currentColor;opacity:.2;transform:scale(0);animation:rip .55s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+.top:before{animation:flt 9s ease-in-out infinite alternate}.top:after{animation:flt 12s ease-in-out infinite alternate-reverse}
+@keyframes flt{to{transform:translate(-22px,16px) scale(1.14)}}
+.pop{animation:pop .55s cubic-bezier(.2,.9,.3,1.2) backwards}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}}
+nav .on svg{animation:bump .45s cubic-bezier(.3,1.7,.5,1)}
+@keyframes bump{from{transform:scale(.6) translateY(4px)}}
+.seg .on,.chips .on{animation:pop2 .32s cubic-bezier(.3,1.7,.5,1)}
+@keyframes pop2{from{transform:scale(.86)}}
+.donut circle{animation:draw 1s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes draw{from{stroke-dasharray:0 100}}
+.bar i{animation:grow .9s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes grow{from{width:0}}
+#toast{animation:tin .35s cubic-bezier(.3,1.5,.5,1)}
+@keyframes tin{from{opacity:0;transform:translate(-50%,18px) scale(.9)}}
+.pane{animation:none}#sheet.open .pane{animation:sup .42s cubic-bezier(.2,.9,.3,1.12)}#sheet.open{animation:fde .25s}
+@keyframes sup{from{transform:translateY(70px) scale(.96);opacity:0}}@keyframes fde{from{opacity:0}}
+#fab{animation:ring 2.6s ease-out 1.2s 2}
+@keyframes ring{0%{box-shadow:0 10px 22px rgba(14,124,102,.45),0 0 0 4px rgba(255,255,255,.35),0 0 0 4px rgba(23,166,136,.5)}100%{box-shadow:0 10px 22px rgba(14,124,102,.45),0 0 0 4px rgba(255,255,255,.35),0 0 0 26px rgba(23,166,136,0)}}
+@media(prefers-reduced-motion:reduce){*,:before,:after{animation:none!important;transition:none!important}}
 </style></head>
 <body>
 <div id="app"></div>
@@ -114,7 +152,7 @@ function refresh(){if(tab=='more'&&!fm)render()}
 function cloudCard(){const c=window.cloud||{};
  if(!c.ok)return '<div class=card><b>Cloud sync</b><small style="display:block;margin-top:4px">Not set up. Add your Firebase keys in the file to sync across devices.</small></div>';
  if(!c.user)return '<button class=act onclick="cloud.login()">Sign in with Google<small>Sync your records across all your devices</small></button>';
- return `<div class=card><div class=between><div><b>${esc(c.user.email||c.user.displayName||'')}</b><small style="display:block">${c.status=='error'?'Sync failed. Will retry on next change.':c.status=='syncing'?'Syncing…':'Synced to cloud'}</small></div><button class=mini onclick="cloud.logout()">Sign out</button></div></div>`}
+ return `<div class=card><div class=between><div><b>${esc(c.user.email||c.user.displayName||'')}</b><small style="display:block">${c.status=='error'?'Sync failed. Will retry on next change.':c.status=='syncing'?'Syncing…':'Synced to cloud'}</small>${c.status=='error'&&c.err?`<small style="display:block;color:var(--coral)">${esc(c.err)}</small>`:''}</div><button class=mini onclick="cloud.logout()">Sign out</button></div></div>`}
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>(n<0?'-':'')+'৳'+Math.round(Math.abs(n)).toLocaleString(lang=='bn'?'bn-BD':'en-IN');
 const col=c=>P[[...c].reduce((s,ch)=>s+ch.charCodeAt(0),0)%P.length];
@@ -142,11 +180,20 @@ function tl(r){if(lang!='bn'||!r)return;const w=document.createTreeWalker(r,Node
  r.querySelectorAll('[placeholder],[aria-label]').forEach(e=>['placeholder','aria-label'].forEach(a=>e.hasAttribute(a)&&e.setAttribute(a,T(e.getAttribute(a)))))}
 const _c=window.confirm.bind(window),_p=window.prompt.bind(window);window.confirm=m=>_c(T(m));window.prompt=(m,d)=>_p(T(m),d);
 function setLang(){S.lang=lang=='bn'?'en':'bn';save();location.reload()}
+let fx=true;const cu={};
+const hap=p=>{if(S.nohap)return;try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
+const calm=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
+function ripple(t,e){if(calm())return;const r=t.getBoundingClientRect(),d=Math.max(r.width,r.height)*1.6,x=document.createElement('span');x.className='rip';x.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;t.appendChild(x);setTimeout(()=>x.remove(),600)}
+function count(el,a,b){const t0=performance.now();(function f(t){const p=Math.min((t-t0)/750,1),k=1-Math.pow(1-p,3);el.textContent=bn(fmt(a+(b-a)*k));if(p<1)requestAnimationFrame(f)})(t0)}
+function fxRun(){if(calm()){fx=false;return}
+ if(fx){fx=false;document.querySelectorAll('#app .row,#app .card,#app .legend,#app .day,#app .act').forEach((e,i)=>{e.classList.add('pop');e.style.animationDelay=Math.min(i,14)*35+'ms'})}
+ const b=document.querySelector('#app .net b[data-v]');if(b){const to=+b.dataset.v,k=tab+month,from=cu[k]===undefined?0:cu[k];cu[k]=to;if(from!=to)count(b,from,to)}}
+addEventListener('pointerdown',e=>{const t=e.target.closest('button');if(!t)return;hap(t.matches('#fab,.pri,.mini')?[14]:t.matches('nav button')?6:9);ripple(t,e)},{passive:true});
 function bal(id){const a=S.accounts.find(x=>x.id==id);let b=a?a.init:0;
  S.txs.forEach(t=>{if(t.a==id)b+=t.type=='income'?t.amt:-t.amt;if(t.type=='transfer'&&t.b==id)b+=t.amt});return b}
-function toast(m){const t=$('#toast');t.textContent=bn(T(m));t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',2600)}
-function go(t){tab=t;render();scrollTo(0,0)}
-function sh(d){const[y,m]=month.split('-').map(Number),dt=new Date(y,m-1+d,1);month=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');render()}
+function toast(m){const t=$('#toast');t.textContent=bn(T(m));hap(/^(Enter|Pick|Choose|Give|This account|Keep|That file|Could not|Sign-in)/.test(m)?[40,50,40]:[12,40,18]);t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',2600)}
+function go(t){tab=t;fx=true;render();scrollTo(0,0)}
+function sh(d){const[y,m]=month.split('-').map(Number),dt=new Date(y,m-1+d,1);month=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');fx=true;render()}
 function hdr(extra){const l=new Date(month+'-01').toLocaleDateString(LC(),{month:'long',year:'numeric'});
  return `<div class=top><div class=mn><button onclick="sh(-1)" aria-label="Previous month">‹</button><span>${l}</span><button onclick="sh(1)" aria-label="Next month">›</button></div>${extra}</div>`}
 
@@ -163,7 +210,7 @@ function rec(){
   const tr=t.type=='transfer';
   h+=`<button class=row onclick="${t.type=='carry'?'editCarry':'openTx'}(${t.id})"><div class=ic style="background:color-mix(in srgb,${tr?'#5F7A8A':col(t.cat)} 16%,transparent);color:${tr?'#5F7A8A':col(t.cat)}">${svg(IC[CI[t.cat]||'dots'])}</div><div class=mid><b>${esc(t.cat)}</b><small>${t.type=='carry'?'From previous month':esc(t.note)+' '+(tr?nm(t.a)+' → '+nm(t.b):nm(t.a))}</small></div><b class=${t.type}>${t.type=='expense'?'-':t.type=='transfer'?'':'+'}${fmt(t.amt)}</b></button>`});
  if(!h)h='<div class=empty>No records this month.<br>Tap + to add your first expense or income.</div>';
- return hdr(`<div class=net><small>Left this month</small><b>${fmt(i+c-e)}</b></div><div class=trio><span>Income<b class=in>${fmt(i)}</b></span>${c?`<span>Carried over<b class=in>${fmt(c)}</b></span>`:''}<span>Expense<b class=out>${fmt(e)}</b></span></div>`)+`<div class=body>${p>0&&!c?`<div class=card><div class=between><div><b>Carry over</b><small style="display:block">${pl} ended with ${fmt(p)} left</small></div><button class=mini onclick="addCarry(${p})">Add to this month</button></div></div>`:''}${h}</div>`}
+ return hdr(`<div class=net><small>Left this month</small><b data-v="${i+c-e}">${fmt(i+c-e)}</b></div><div class=trio><span>Income<b class=in>${fmt(i)}</b></span>${c?`<span>Carried over<b class=in>${fmt(c)}</b></span>`:''}<span>Expense<b class=out>${fmt(e)}</b></span></div>`)+`<div class=body>${p>0&&!c?`<div class=card><div class=between><div><b>Carry over</b><small style="display:block">${pl} ended with ${fmt(p)} left</small></div><button class=mini onclick="addCarry(${p})">Add to this month</button></div></div>`:''}${h}</div>`}
 
 function stats(){
  const ts=inMonth(st),m={};ts.forEach(t=>m[t.cat]=(m[t.cat]||0)+t.amt);
@@ -179,7 +226,7 @@ function bud(){
  const ex=inMonth('expense'),tb=Object.values(S.budgets).reduce((s,v)=>s+v,0),ts=ex.reduce((s,t)=>s+t.amt,0);
  const rows=CATS.expense.map(c=>{const sp=ex.filter(t=>t.cat==c).reduce((s,t)=>s+t.amt,0),b=S.budgets[c]||0,o=b&&sp>b;
   return `<div class=card><div class=between><div class=cn><div class=ic style="background:color-mix(in srgb,${col(c)} 16%,transparent);color:${col(c)}">${svg(IC[CI[c]||'dots'])}</div><b>${c}</b></div><input type=number inputmode=numeric min=0 placeholder="Set budget" aria-label="${c} budget" value="${b||''}" onchange="setB('${c}',this.value)"></div><div class=bar><i style="width:${b?Math.min(sp/b*100,100):0}%;background:${o?'var(--coral)':'var(--jade)'}"></i></div><small>${fmt(sp)} spent${b?' · '+(o?fmt(sp-b)+' over':fmt(b-sp)+' left'):''}</small></div>`}).join('');
- return hdr(`<div class=net><small>Budget left</small><b>${tb?fmt(tb-ts):'—'}</b></div><div class=trio><span>Budget<b>${fmt(tb)}</b></span><span>Spent<b class=out>${fmt(ts)}</b></span></div>`)+`<div class=body>${rows}</div>`}
+ return hdr(`<div class=net><small>Budget left</small><b${tb?` data-v="${tb-ts}"`:''}>${tb?fmt(tb-ts):'—'}</b></div><div class=trio><span>Budget<b>${fmt(tb)}</b></span><span>Spent<b class=out>${fmt(ts)}</b></span></div>`)+`<div class=body>${rows}</div>`}
 function setB(c,v){const n=parseFloat(v);if(n>0)S.budgets[c]=n;else delete S.budgets[c];save();render()}
 
 function acc(){
@@ -187,17 +234,18 @@ function acc(){
  GROUPS.forEach(g=>{const l=S.accounts.filter(a=>a.group==g);if(!l.length)return;
   h+=`<div class=group><span>${g}</span><span>${fmt(l.reduce((s,a)=>s+bal(a.id),0))}</span></div>`;
   l.forEach(a=>h+=`<button class=row onclick="openAcc(${a.id})"><div class=ic style="background:color-mix(in srgb,var(--jade) 16%,transparent);color:var(--jade)">${svg(IC[GI[a.group]||'dots'])}</div><div class=mid><b>${esc(a.name)}</b></div><b class="${bal(a.id)<0?'expense':''}">${fmt(bal(a.id))}</b></button>`)});
- return `<div class=top><div class=net><small>Total assets</small><b>${fmt(tot)}</b></div></div><div class=body>${h}<button class=act onclick="openAcc()">+ Add account</button></div>`}
+ return `<div class=top><div class=net><small>Total assets</small><b data-v="${tot}">${fmt(tot)}</b></div></div><div class=body>${h}<button class=act onclick="openAcc()">+ Add account</button></div>`}
 
 function more(){return `<div class=top><div class=mn><span>More</span></div></div><div class=body>${cloudCard()}
 <button class=act onclick="setLang()">ভাষা: বাংলা / Language: English<small>Tap to switch · বদলাতে চাপুন</small></button>
+<button class=act onclick="S.nohap=!S.nohap;save();render();hap(18)">কম্পন / Vibration: ${S.nohap?'বন্ধ / Off':'চালু / On'}<small>Android ফোনে কাজ করে · Works on Android phones</small></button>
 <button class=act onclick="csv()">Export records (CSV)<small>Open in Excel or Google Sheets</small></button>
 <button class=act onclick="backup()">Back up data (JSON)<small>Save a full copy of everything</small></button>
 <button class=act onclick="$('#rf').click()">Restore from backup<small>Replaces all current data</small></button>
 <button class=act style="color:var(--coral)" onclick="wipe()">Erase all data<small>Cannot be undone</small></button>
 <p class=empty>Hishab keeps your data on this device only.<br>Back up regularly.</p></div>`}
 
-function sheet(){sheet0();tl($('#sheet'))}
+function sheet(){const was=$('#sheet').classList.contains('on');sheet0();tl($('#sheet'));if(!was&&fm)$('#sheet').classList.add('open')}
 function sheet0(){
  const el=$('#sheet'),f=fm;if(!f){el.className='';el.innerHTML='';return}
  el.className='on';
@@ -227,7 +275,7 @@ function saveTx(){const f=fm,amt=parseFloat(f.amt);
  if(f.type=='transfer'&&f.a==f.b)return toast('Choose two different accounts.');
  const t={id:f.id||S.n++,type:f.type,date:f.date,amt,cat:f.type=='transfer'?'Transfer':f.cat,a:f.a,b:f.type=='transfer'?f.b:null,note:f.note.trim()};
  const i=S.txs.findIndex(x=>x.id==t.id);i>=0?S.txs[i]=t:S.txs.push(t);
- month=t.date.slice(0,7);save();shut();render();toast('Saved')}
+ month=t.date.slice(0,7);fx=true;save();shut();render();toast('Saved')}
 function delTx(){if(!confirm('Delete this record?'))return;S.txs=S.txs.filter(t=>t.id!=fm.id);save();shut();render();toast('Deleted')}
 function openAcc(id){kind='acc';const a=S.accounts.find(x=>x.id==id);fm=a?{...a}:{name:'',group:'Cash',init:0};sheet()}
 function saveAcc(){const f=fm,n=f.name.trim();if(!n)return toast('Give the account a name.');
@@ -251,7 +299,7 @@ function wipe(){if(confirm('Erase every record, account and budget?')&&confirm('
 function render(){
  $('#app').innerHTML=({rec,stats,bud,acc,more})[tab]();
  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==tab));
- $('#fab').style.display=tab=='rec'?'':'none';tl($('#app'));tl($('nav'));tl($('#fab'))}
+ $('#fab').style.display=tab=='rec'?'':'none';tl($('#app'));tl($('nav'));tl($('#fab'));fxRun()}
 document.querySelectorAll('nav button').forEach(b=>b.insertAdjacentHTML('afterbegin',svg(NI[b.dataset.t])));
 render();
 </script>
@@ -268,7 +316,7 @@ if(ok){
  cloud.login=()=>signInWithPopup(auth,new GoogleAuthProvider()).catch(e=>toast('Sign-in failed: '+(e.code||e.message)));
  cloud.logout=()=>signOut(auth);
  cloud.push=()=>{if(!cloud.user)return;cloud.status='syncing';note();clearTimeout(timer);
-  timer=setTimeout(async()=>{try{const s=cloudGet();s.at=s.at||Date.now();await set(ref(db,'users/'+cloud.user.uid),{data:JSON.stringify(s),at:s.at});cloud.status='ok'}catch(e){cloud.status='error'}note()},800)};
+  timer=setTimeout(async()=>{try{const s=cloudGet();s.at=s.at||Date.now();await set(ref(db,'users/'+cloud.user.uid),{data:JSON.stringify(s),at:s.at});cloud.status='ok'}catch(e){cloud.status='error';cloud.err=e.code||e.message}note()},800)};
  onAuthStateChanged(auth,u=>{cloud.user=u;unsub&&unsub();first=true;note();if(!u)return;
   unsub=onValue(ref(db,'users/'+u.uid),snap=>{
    const s=cloudGet(),was=first;first=false;
@@ -276,7 +324,7 @@ if(ok){
    const d=snap.val(),ra=d.at||0,la=s.at||0;
    if(was&&!la&&s.txs.length&&!confirm('This device already has records, and the cloud has data too. OK uses the cloud data. Cancel keeps this device data and uploads it.'))return cloud.push();
    if(ra>la||(was&&!la&&s.txs.length)){applyRemote(d.data);cloud.status='ok';note()}else if(ra<la)cloud.push();else{cloud.status='ok';note()}
-  },()=>{cloud.status='error';note()})});
+  },e=>{cloud.status='error';cloud.err=e.code||e.message;note()})});
  addEventListener('online',()=>cloud.push());
 }
 </script>
